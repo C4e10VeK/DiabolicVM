@@ -1,0 +1,14 @@
+%const HELLO_WORLD string "Hello world!"
+
+%fn main
+{
+	loadac HELLO_WORLD ;; push constant to arg0
+	call println ;; after call args stack clear
+	push "Test", 0
+	loada 0
+	call println
+	ret
+}
+
+call main
+

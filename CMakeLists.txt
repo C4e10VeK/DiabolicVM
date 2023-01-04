@@ -5,3 +5,4 @@ file(GLOB_RECURSE HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h" "${CMAKE_CURRENT
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

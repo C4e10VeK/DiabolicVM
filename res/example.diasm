@@ -1,14 +1,22 @@
-%const HELLO_WORLD string "Hello world!"
+;; op	r	r	r	val
+;; nop
+;; movc 0..			const
+;; add	0..	0..	0..
+;; sub	0..	0..	0..
+;; mul	0..	0..	0..
+;; div	0..	0..	0..
+;; inc	0..
+;; dec	0..
+;; ret
+
+%const int a = 10 ;; in const table id 0
+%const string text = "hello world!"
 
 %fn main
 {
-	loadac HELLO_WORLD ;; push constant to arg0
-	call println ;; after call args stack clear
-	push "Test", 0
-	loada 0
-	call println
+	movc r0 a
+	movc r1 12
+	add r0 r1 r2 ;;r2 = r0 + r1
 	ret
 }
-
-call main
 

@@ -5,160 +5,79 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include "../Instruction.hpp"
+#include "../utils.hpp"
 
 namespace dialang::vm
 {
 	struct BaseObject
 	{
-		DiaBcTypes type_;
-		bool isSigned_ = false;
+		enum Type
+		{
+			TYPE_CHAR,
+			TYPE_I32,
+			TYPE_I64,
+			TYPE_STRING,
+			TYPE_FUNCTION
+		};
+
+		Type type_;
 
 		virtual ~BaseObject() = default;
 
 		virtual std::string toString() = 0;
-	};
 
-	namespace priv
-	{
+		template<Type t>
+		bool is()
+		{
+			return type_ == t;
+		}
+
 		template<typename T>
-		inline std::string toString(T value)
+		T *as()
 		{
-			return "";
+			return reinterpret_cast<T *>(this);
 		}
-	
-		template<>
-		inline std::string toString<std::string>(std::string value)
-		{
-			return value;
-		}
-	
-		template<>
-		inline std::string toString<int32_t>(int32_t value)
-		{
-			return std::to_string(value);
-		}
-	
-		template<>
-		inline std::string toString<int64_t>(int64_t value)
-		{
-			return std::to_string(value);
-		}
-	}
+	};	
 
-	template<typename T, DiaBcTypes>
+	template<typename T>
 	struct BaseObjectGen : public BaseObject
 	{
 		T value_;
 
 		std::string toString() override
 		{
-			return priv::toString(value_);
+			return utils::toString(value_);
 		}
 	};
 
-	using StringObject = BaseObjectGen<std::string, TYPE_STRING>;
-	using I32Object = BaseObjectGen<int32_t, TYPE_DWORD>;
-	using I64Object = BaseObjectGen<int64_t, TYPE_QWORD>;
+	using StringObject = BaseObjectGen<std::string>;
+	using I32Object = BaseObjectGen<int32_t>;
+	using I64Object = BaseObjectGen<int64_t>;
 
-	class VmState;
-
-	using FnNativeType = std::function<bool(VmState &, const std::vector<BaseObject *> &args)>;
-	class NativeFunction
+	class Chunk
 	{
 	private:
-		FnNativeType m_function;
+		std::vector<BaseObject *> m_constants;
+		std::vector<uint8_t> m_code;
 	public:
-		NativeFunction() = default;
-		NativeFunction(FnNativeType fn) : m_function(fn) { }
 
-		bool call(VmState &state, const std::vector<BaseObject *> &args)
+		~Chunk()
 		{
-			return m_function(state, args);
+			for (const auto &constant : m_constants)
+				delete constant;
+		}
+
+		void write(uint8_t code)
+		{
+			m_code.emplace_back(code);
+		}
+
+		int32_t addConstant(BaseObject *object)
+		{
+			m_constants.emplace_back(object);
+			return m_constants.size() - 1;
 		}
 	};
-
-	struct VmState
-	{
-		uint64_t regs[REGISTERS_COUNT] = {0};
-		std::vector<BaseObject *> stack;
-
-		std::unordered_map<std::string, NativeFunction> natives;
-
-		~VmState()
-		{
-			for (const auto &val : stack)
-			{
-				delete val;
-			}
-		}
-
-		void addNativeFn(const std::string &fnName, FnNativeType fn)
-		{
-			natives[fnName] = NativeFunction(fn);
-		}
-	};
-
-	// TODO: rework executer virtual machine
-	inline bool exec(const std::vector<uint8_t> &bc)
-	{
-		VmState state;	
-		state.addNativeFn("println", [](VmState &state, const std::vector<BaseObject *> &args)
-		{
-			for (const auto &obj : args)
-			{
-				std::cout << obj->toString();
-			}
-
-			std::cout << std::endl;
-
-			return true;
-		});
-
-		while (state.regs[R_IP] != bc.size())
-		{
-			uint8_t op = bc[state.regs[R_IP]++];
-
-			switch (op)
-			{
-			case OP_NOP:
-				++state.regs[R_IP];
-				break;
-			case OP_LOAD:
-			{
-				StringObject obj;
-				obj.type_ = (DiaBcTypes)bc[state.regs[R_IP]++];
-				obj.isSigned_ = true;
-				while (bc[state.regs[R_IP]] != '\0')
-				{
-					obj.value_.push_back(bc[state.regs[R_IP]++]);
-				}
-				++state.regs[R_IP];
-				state.stack.emplace_back(new StringObject(obj));
-				break;
-			}
-			case OP_CALL:
-			{
-				std::string fnName;
-				while(bc[state.regs[R_IP]] != '\0')
-				{
-					fnName.push_back(bc[state.regs[R_IP]++]);
-				}
-				++state.regs[R_IP];
-
-				state.natives[fnName].call(state, state.stack);
-
-				break;
-			}
-			case OP_RET:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		return false;
-	}
 }
 
 #endif // DVM_VIRTUALMACHINE_HPP

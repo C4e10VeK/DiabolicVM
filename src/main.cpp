@@ -1,15 +1,19 @@
 #include "vm/VirtualMachine.hpp"
+#include "vm/OpCodes.hpp"
 
 int main()
 {
 	dialang::vm::Chunk chunk;
 
-	auto intval = new dialang::vm::I32Object();
-	intval->value_ = 12;
-	int32_t contId = chunk.addConstant(intval);
+	dialang::vm::I32Object intval;
+	intval.value_ = 12;
+	int32_t constId = chunk.addConstant(intval);
 	chunk.write(dialang::vm::OP_CONST);
-	chunk.write(contId);
+	chunk.write(constId);
 	chunk.write(dialang::vm::OP_RET);
+
+	dialang::vm::VM vm;
+	vm.interpret(chunk);
 
 	return 0;
 }

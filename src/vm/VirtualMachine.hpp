@@ -2,57 +2,14 @@
 #define DVM_VIRTUALMACHINE_HPP
 
 #include <iostream>
+#include <stdint.h>
 #include <vector>
 #include <string>
-#include <functional>
-#include "../utils.hpp"
+#include "OpCodes.hpp"
+#include "Object.hpp"
 
 namespace dialang::vm
 {
-	struct BaseObject
-	{
-		enum Type
-		{
-			TYPE_CHAR,
-			TYPE_I32,
-			TYPE_I64,
-			TYPE_STRING,
-			TYPE_FUNCTION
-		};
-
-		Type type_;
-
-		virtual ~BaseObject() = default;
-
-		virtual std::string toString() = 0;
-
-		template<Type t>
-		bool is()
-		{
-			return type_ == t;
-		}
-
-		template<typename T>
-		T *as()
-		{
-			return reinterpret_cast<T *>(this);
-		}
-	};	
-
-	template<typename T>
-	struct BaseObjectGen : public BaseObject
-	{
-		T value_;
-
-		std::string toString() override
-		{
-			return utils::toString(value_);
-		}
-	};
-
-	using StringObject = BaseObjectGen<std::string>;
-	using I32Object = BaseObjectGen<int32_t>;
-	using I64Object = BaseObjectGen<int64_t>;
 
 	class Chunk
 	{
@@ -63,7 +20,7 @@ namespace dialang::vm
 
 		~Chunk()
 		{
-			for (const auto &constant : m_constants)
+			for (auto &constant : m_constants)
 				delete constant;
 		}
 
@@ -76,6 +33,74 @@ namespace dialang::vm
 		{
 			m_constants.emplace_back(object);
 			return m_constants.size() - 1;
+		}
+
+		int32_t addConstant(I32Object &object)
+		{
+			m_constants.emplace_back(new I32Object(object));
+			return m_constants.size() - 1;
+		}
+
+		int32_t addConstant(I64Object &object)
+		{
+			m_constants.emplace_back(new I64Object(object));
+			return m_constants.size() - 1;
+		}
+
+		int32_t addConstant(StringObject &object)
+		{
+			m_constants.emplace_back(new StringObject(object));
+			return m_constants.size() - 1;
+		}
+
+		uint8_t *getFirstOp()
+		{
+			return &m_code[0];
+		}
+
+		BaseObject *getConstant(int32_t index)
+		{
+			return m_constants[index];
+		}
+	};
+
+	class VM
+	{
+	private:
+		Chunk *m_chunk;
+		uint8_t *m_ip;
+	public:
+		enum class InterpretResult
+		{
+			Ok,
+			CompileError,
+			RuntimeError,
+		};
+
+		InterpretResult interpret(Chunk &chunk)
+		{
+			m_chunk = &chunk;
+			m_ip = m_chunk->getFirstOp();
+
+			for(;;)
+			{
+				uint8_t operation;
+				switch (operation = *m_ip++)
+				{
+				case OP_NOP:
+					break;
+				case OP_RET:
+					return InterpretResult::Ok;
+				case OP_CONST:
+					{
+						BaseObject *value = m_chunk->getConstant(*m_ip++);
+						value->toString();
+					}
+					break;
+				}
+			}
+
+			return InterpretResult::Ok;
 		}
 	};
 }

@@ -10,6 +10,7 @@ namespace dialang::vm
 		OP_NOP,
 		OP_RET,
 		OP_CONST,
+		OP_PUSH,
 		OP_MOVC,
 		OP_ADD,	
 		OP_SUB,

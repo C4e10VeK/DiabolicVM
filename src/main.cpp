@@ -4,12 +4,13 @@
 int main()
 {
 	dialang::vm::Chunk chunk;
-
-	dialang::vm::I32Object intval;
-	intval.value_ = 12;
-	int32_t constId = chunk.addConstant(intval);
+	int32_t constId = chunk.addConstant(156);
 	chunk.write(dialang::vm::OP_CONST);
 	chunk.write(constId);
+	constId = chunk.addConstant(2);
+	chunk.write(dialang::vm::OP_CONST);
+	chunk.write(constId);
+	chunk.write(dialang::vm::OP_ADD);
 	chunk.write(dialang::vm::OP_RET);
 
 	dialang::vm::VM vm;

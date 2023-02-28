@@ -4,9 +4,11 @@
 #include <iostream>
 #include <stdint.h>
 #include <vector>
+#include <array>
+#include <stack>
 #include <string>
 #include "OpCodes.hpp"
-#include "Object.hpp"
+#include "Types.hpp"
 
 namespace dialang::vm
 {
@@ -14,42 +16,17 @@ namespace dialang::vm
 	class Chunk
 	{
 	private:
-		std::vector<BaseObject *> m_constants;
+		std::vector<Value> m_constants;
 		std::vector<uint8_t> m_code;
 	public:
-
-		~Chunk()
-		{
-			for (auto &constant : m_constants)
-				delete constant;
-		}
-
 		void write(uint8_t code)
 		{
 			m_code.emplace_back(code);
 		}
 
-		int32_t addConstant(BaseObject *object)
+		int32_t addConstant(Value value)
 		{
-			m_constants.emplace_back(object);
-			return m_constants.size() - 1;
-		}
-
-		int32_t addConstant(I32Object &object)
-		{
-			m_constants.emplace_back(new I32Object(object));
-			return m_constants.size() - 1;
-		}
-
-		int32_t addConstant(I64Object &object)
-		{
-			m_constants.emplace_back(new I64Object(object));
-			return m_constants.size() - 1;
-		}
-
-		int32_t addConstant(StringObject &object)
-		{
-			m_constants.emplace_back(new StringObject(object));
+			m_constants.emplace_back(value);
 			return m_constants.size() - 1;
 		}
 
@@ -58,7 +35,7 @@ namespace dialang::vm
 			return &m_code[0];
 		}
 
-		BaseObject *getConstant(int32_t index)
+		Value getConstant(int32_t index)
 		{
 			return m_constants[index];
 		}
@@ -69,6 +46,7 @@ namespace dialang::vm
 	private:
 		Chunk *m_chunk;
 		uint8_t *m_ip;
+		std::stack<Value> m_stack;
 	public:
 		enum class InterpretResult
 		{
@@ -88,13 +66,27 @@ namespace dialang::vm
 				switch (operation = *m_ip++)
 				{
 				case OP_NOP:
+					++m_ip;
 					break;
 				case OP_RET:
 					return InterpretResult::Ok;
 				case OP_CONST:
 					{
-						BaseObject *value = m_chunk->getConstant(*m_ip++);
-						value->toString();
+						Value value = m_chunk->getConstant(*m_ip++);
+						m_stack.push(value);
+					}
+					break;
+				case OP_ADD:
+					{
+						Value b = m_stack.top();
+						m_stack.pop();
+						Value a = m_stack.top();
+						m_stack.pop();
+
+						if (a.type == ValueType::Number && b.type == ValueType::Number)
+						{
+							m_stack.push(a.as.int32 + b.as.int32);
+						}
 					}
 					break;
 				}

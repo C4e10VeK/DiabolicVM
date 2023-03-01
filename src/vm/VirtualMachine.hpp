@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <variant>
 #include <vector>
 #include <array>
 #include <stack>
@@ -83,9 +84,14 @@ namespace dialang::vm
 						Value a = m_stack.top();
 						m_stack.pop();
 
-						if (a.type == ValueType::Number && b.type == ValueType::Number)
+						if (a.is<int32_t>() && b.is<int32_t>())
 						{
-							m_stack.push(a.as.int32 + b.as.int32);
+							m_stack.push(a.as<int32_t>() + b.as<int32_t>());
+						}
+
+						if (a.is<String>() && b.is<String>())
+						{
+							m_stack.push(a.as<String>()->value_ + b.as<String>()->value_);
 						}
 					}
 					break;

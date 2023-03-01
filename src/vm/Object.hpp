@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <string>
+#include <type_traits>
 #include "../utils.hpp"
 
 namespace dialang::vm
@@ -12,9 +13,6 @@ namespace dialang::vm
 	{
 		enum class Type
 		{
-			TYPE_CHAR,
-			TYPE_I32,
-			TYPE_I64,
 			TYPE_STRING,
 			TYPE_FUNCTION
 		};
@@ -28,18 +26,6 @@ namespace dialang::vm
 		virtual ~BaseObject() = default;
 
 		virtual std::string toString() = 0;
-
-		template<Type t>
-		bool is()
-		{
-			return type_ == t;
-		}
-
-		template<typename T>
-		T *as()
-		{
-			return reinterpret_cast<T *>(this);
-		}
 	};	
 
 	template<typename T, BaseObject::Type ObjType>
@@ -48,6 +34,7 @@ namespace dialang::vm
 		T value_;
 
 		BaseObjectGen() : BaseObject(ObjType) { }
+		BaseObjectGen(T value) : BaseObject(ObjType), value_(value) { }
 
 		std::string toString() override
 		{
@@ -56,28 +43,11 @@ namespace dialang::vm
 	};
 
 	using StringObject = BaseObjectGen<std::string, BaseObject::Type::TYPE_STRING>;
-	using I32Object = BaseObjectGen<int32_t, BaseObject::Type::TYPE_I32>;
-	using I64Object = BaseObjectGen<int64_t, BaseObject::Type::TYPE_I64>;
 
-	using FnNativeType = std::function<bool(void)>;
-
-	template<>
-	struct BaseObjectGen<FnNativeType, BaseObject::Type::TYPE_FUNCTION> : public BaseObject
+	inline StringObject operator+(const StringObject &lhs, const StringObject &rhs)
 	{
-		FnNativeType native_;
-
-		std::string name_;
-
-		BaseObjectGen() : BaseObject(BaseObject::Type::TYPE_FUNCTION) { }
-
-		std::string toString() override
-		{
-			return name_ + ": fn(...)";
-		}
-	};
-
-	using NativeFnObject = BaseObjectGen<FnNativeType, BaseObject::Type::TYPE_FUNCTION>;
-
+		return StringObject(lhs.value_ + rhs.value_);
+	}
 }
 
 #endif // DVM_OBJECT_HPP

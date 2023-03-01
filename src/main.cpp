@@ -4,13 +4,17 @@
 int main()
 {
 	dialang::vm::Chunk chunk;
-	int32_t constId = chunk.addConstant(156);
+
+	int32_t constStrId = chunk.addConstant("Hello world!");
 	chunk.write(dialang::vm::OP_CONST);
-	chunk.write(constId);
-	constId = chunk.addConstant(2);
+	chunk.write(constStrId);
+
+	constStrId = chunk.addConstant("Anton");
 	chunk.write(dialang::vm::OP_CONST);
-	chunk.write(constId);
+	chunk.write(constStrId);
+
 	chunk.write(dialang::vm::OP_ADD);
+
 	chunk.write(dialang::vm::OP_RET);
 
 	dialang::vm::VM vm;

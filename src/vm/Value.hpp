@@ -13,6 +13,7 @@ namespace dialang::vm
 	struct Value
 	{
 		ValueType value_;
+		Value() = default;
 		Value(std::string value);
 		Value(const char *value);
 		Value(int32_t value);

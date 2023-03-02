@@ -4,13 +4,15 @@
 #include <iostream>
 #include <variant>
 #include <vector>
-#include <stack>
 #include <string>
 #include "OpCodes.hpp"
 #include "Value.hpp"
+#include "Stack.hpp"
 
 namespace dialang::vm
 {
+
+	constexpr size_t STACK_MAX = 256;
 
 	class Chunk
 	{
@@ -52,7 +54,7 @@ namespace dialang::vm
 	private:
 		Chunk *m_chunk;
 		uint8_t *m_ip;
-		std::stack<Value> m_stack;
+		Stack<STACK_MAX> m_stack;
 	public:
 
 		InterpretResult interpret(Chunk &chunk)
@@ -60,10 +62,8 @@ namespace dialang::vm
 			m_chunk = &chunk;
 			m_ip = m_chunk->getFirstOp();
 
-	#define BIN_OP(op) {Value b = m_stack.top(); \
-						m_stack.pop(); \
-						Value a = m_stack.top(); \
-						m_stack.pop(); \
+	#define BIN_OP(op) {Value b = m_stack.pop(); \
+						Value a = m_stack.pop(); \
 						if (!a.isAny<int32_t>() && !b.isAny<int32_t>()) \
 							return InterpretResult::RuntimeError; \
 						m_stack.push(a.as<int32_t>() op b.as<int32_t>());}
@@ -86,10 +86,8 @@ namespace dialang::vm
 					break;
 				case OP_ADD:
 					{
-						Value b = m_stack.top();
-						m_stack.pop();
-						Value a = m_stack.top();
-						m_stack.pop();
+						Value b = m_stack.pop();
+						Value a = m_stack.pop();
 
 						if (a.is<std::string>() && b.is<std::string>())
 						{
@@ -113,8 +111,7 @@ namespace dialang::vm
 					break;
 				case OP_NEG:
 					{
-						Value val = m_stack.top();
-						m_stack.pop();
+						Value val = m_stack.pop();
 						if (!val.isAny<int32_t>())
 						{
 							return InterpretResult::RuntimeError;
@@ -125,8 +122,7 @@ namespace dialang::vm
 					break;
 				case OP_PRINT:
 					{
-						Value a = m_stack.top();
-						m_stack.pop();
+						Value a = m_stack.pop();
 						a.print();
 						std::cout << std::endl;
 					}

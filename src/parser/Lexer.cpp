@@ -1,6 +1,6 @@
 #include "Lexer.hpp"
 
-namespace dialang::vm
+namespace dialang
 {
 	static inline bool isSpace(char c)
 	{
@@ -40,7 +40,7 @@ namespace dialang::vm
 	{
 		skipWhiteSpace();
 
-		return {"", TokenType::None};
+		return {"", TOKEN_NONE};
 	}
 
 	bool Lexer::isEnd() const

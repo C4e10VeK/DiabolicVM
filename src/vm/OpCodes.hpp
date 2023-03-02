@@ -5,7 +5,7 @@
 
 namespace dialang::vm
 {
-	enum OpCodes : uint8_t
+	enum OpCode : uint8_t
 	{
 		OP_NOP,
 		OP_RET,
@@ -17,7 +17,10 @@ namespace dialang::vm
 		OP_DIV,
 		OP_INC,
 		OP_DEC,
+		OP_NEG,
 		OP_CALL,
+
+		OP_PRINT,
 
 		OPS_COUNT
 	};

@@ -4,7 +4,7 @@
 #include <string>
 #include "Token.hpp"
 
-namespace dialang::vm
+namespace dialang
 {
 
 	class Lexer

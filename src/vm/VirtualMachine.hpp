@@ -2,14 +2,12 @@
 #define DVM_VIRTUALMACHINE_HPP
 
 #include <iostream>
-#include <stdint.h>
 #include <variant>
 #include <vector>
-#include <array>
 #include <stack>
 #include <string>
 #include "OpCodes.hpp"
-#include "Types.hpp"
+#include "Value.hpp"
 
 namespace dialang::vm
 {
@@ -42,6 +40,13 @@ namespace dialang::vm
 		}
 	};
 
+	enum class InterpretResult
+	{
+		Ok,
+		CompileError,
+		RuntimeError,
+	};
+
 	class VM
 	{
 	private:
@@ -49,17 +54,19 @@ namespace dialang::vm
 		uint8_t *m_ip;
 		std::stack<Value> m_stack;
 	public:
-		enum class InterpretResult
-		{
-			Ok,
-			CompileError,
-			RuntimeError,
-		};
 
 		InterpretResult interpret(Chunk &chunk)
 		{
 			m_chunk = &chunk;
 			m_ip = m_chunk->getFirstOp();
+
+	#define BIN_OP(op) {Value b = m_stack.top(); \
+						m_stack.pop(); \
+						Value a = m_stack.top(); \
+						m_stack.pop(); \
+						if (!a.isAny<int32_t>() && !b.isAny<int32_t>()) \
+							return InterpretResult::RuntimeError; \
+						m_stack.push(a.as<int32_t>() op b.as<int32_t>());}
 
 			for(;;)
 			{
@@ -84,19 +91,53 @@ namespace dialang::vm
 						Value a = m_stack.top();
 						m_stack.pop();
 
-						if (a.is<int32_t>() && b.is<int32_t>())
+						if (a.is<std::string>() && b.is<std::string>())
 						{
-							m_stack.push(a.as<int32_t>() + b.as<int32_t>());
+							m_stack.push(a.as<std::string>() + b.as<std::string>());
+							break;
 						}
 
-						if (a.is<String>() && b.is<String>())
+						if (!a.isAny<int32_t>() && !b.isAny<int32_t>()) 
 						{
-							m_stack.push(a.as<String>()->value_ + b.as<String>()->value_);
+							return InterpretResult::RuntimeError;
 						}
+						
+						m_stack.push(a.as<int32_t>() + b.as<int32_t>());
 					}
 					break;
+				case OP_SUB: BIN_OP(-)
+					break;
+				case OP_MUL: BIN_OP(*)
+					break;
+				case OP_DIV: BIN_OP(/)
+					break;
+				case OP_NEG:
+					{
+						Value val = m_stack.top();
+						m_stack.pop();
+						if (!val.isAny<int32_t>())
+						{
+							return InterpretResult::RuntimeError;
+						}
+
+						m_stack.push(-val.as<int32_t>());
+					}
+					break;
+				case OP_PRINT:
+					{
+						Value a = m_stack.top();
+						m_stack.pop();
+						a.print();
+						std::cout << std::endl;
+					}
+					break;
+				default:
+					std::cerr << "Unknown operation!" << std::endl;
+					return InterpretResult::RuntimeError;
 				}
 			}
+
+		#undef BIN_OP
 
 			return InterpretResult::Ok;
 		}

@@ -1,6 +1,6 @@
-let global: i32 = 10
+const global: i32 = 10
 
 let main: fn() -> void
 {
-    global = global + 12
+    let x = global + 12
 }

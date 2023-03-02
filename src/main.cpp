@@ -13,7 +13,7 @@ int main()
 	chunk.write(dialang::vm::OP_CONST);
 	chunk.write(constId);
 
-	chunk.write(dialang::vm::OP_ADD);
+	chunk.write(dialang::vm::OP_CONCAT);
 
 	chunk.write(dialang::vm::OP_PRINT);
 

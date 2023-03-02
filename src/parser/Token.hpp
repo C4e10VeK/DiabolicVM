@@ -24,6 +24,7 @@ namespace dialang
 		TOKEN_STAR,
 		TOKEN_SLASH,
 		TOKEN_COLON,
+		TOKEN_EQUAL,
 		TOKEN_SEMICOLON,
 		TOKEN_DOT,
 

@@ -11,10 +11,13 @@ namespace dialang
 	{
 	private:
 		std::string m_code;
-		std::size_t m_pos;
+		size_t m_pos;
+		int32_t m_line;
 	public:
 		Lexer() = default;
 		Lexer(std::string code);
+
+		void setCode(const std::string &code);
 
 		Token getNextToken();
 

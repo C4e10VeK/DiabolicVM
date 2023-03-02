@@ -10,7 +10,9 @@ namespace dialang::vm
 		OP_NOP,
 		OP_RET,
 		OP_CONST,
-		OP_PUSH,
+		OP_POP,
+		OP_GETG,
+		OP_SETG,
 		OP_ADD,
 		OP_SUB,
 		OP_MUL,
@@ -18,8 +20,9 @@ namespace dialang::vm
 		OP_INC,
 		OP_DEC,
 		OP_NEG,
-		OP_CALL,
-
+		OP_CONCAT,
+		
+		// TODO: realize function print
 		OP_PRINT,
 
 		OPS_COUNT

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstdint>
 #include <type_traits>
+#include "OpCodes.hpp"
 #include "VirtualMachine.hpp"
 #include "../parser/Lexer.hpp"
 
@@ -12,7 +13,7 @@ namespace dialang
 {
 
 	template<typename... Ts>
-	constexpr bool IsByte = (std::is_same_v<Ts, uint8_t> && ...); 
+	constexpr bool IsByte = ((std::is_same_v<Ts, uint8_t> || std::is_same_v<Ts, vm::OpCode>) && ...); 
 
 	class Compiler
 	{
@@ -29,11 +30,12 @@ namespace dialang
 			std::string text;
 			
 			if (!std::filesystem::exists(path))
-			{
 				return false;
-			}
 
 			f.open(path, std::ios::binary);
+
+			if (!f.is_open())
+				return false;
 			
 			f.seekg(0, std::ios::end);
 			text.reserve(f.tellg());
@@ -50,7 +52,10 @@ namespace dialang
 
 		void compile()
 		{
-
+			while (!m_lexer.isEnd())
+			{
+				Token token = m_lexer.getNextToken();
+			}
 		}
 
 		template<typename... Ts>

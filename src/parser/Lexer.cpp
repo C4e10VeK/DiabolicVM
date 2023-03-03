@@ -84,7 +84,10 @@ namespace dialang
 		case ':':
 			return Token(":", TOKEN_COLON);
 		case '=':
-			return Token("=", TOKEN_EQUAL);
+			return match('=') ? Token("==", TOKEN_EQUAL_EQUAL)
+								 : Token("=", TOKEN_EQUAL);
+		case '.':
+			return Token(".", TOKEN_DOT);
 		default:
 			break;
 		}
@@ -101,6 +104,14 @@ namespace dialang
 	{
 		while (isSpace(m_code[m_pos]))
 			++m_pos;
+	}
+
+	bool Lexer::match(char c)
+	{
+		if (isEnd()) return false;
+		if (m_code[m_pos] != c) return false;
+		++m_pos;
+		return true;
 	}
 
 }

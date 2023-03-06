@@ -43,6 +43,7 @@ namespace dialang::vm
 	enum class InterpretResult
 	{
 		Ok,
+		CompileOk,
 		CompileError,
 		RuntimeError,
 	};

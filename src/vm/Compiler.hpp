@@ -12,13 +12,11 @@
 namespace dialang
 {
 
-	template<typename... Ts>
-	constexpr bool IsByte = ((std::is_same_v<Ts, uint8_t> || std::is_same_v<Ts, vm::OpCode>) && ...); 
-
 	class Compiler
 	{
 	private:
 		Lexer m_lexer;
+		Token m_token;
 		vm::Chunk m_chunk;
 	public:
 		Compiler() = default;
@@ -50,16 +48,36 @@ namespace dialang
 			return true;
 		}
 
-		void compile()
+		vm::InterpretResult compile()
 		{
 			while (!m_lexer.isEnd())
 			{
-				Token token = m_lexer.getNextToken();
+				m_token = m_lexer.getNextToken();
 			}
+
+			return vm::InterpretResult::CompileOk;
+		}
+
+	private:
+
+		vm::InterpretResult compileExpr()
+		{
+			return vm::InterpretResult::CompileOk;
+		}
+
+		vm::InterpretResult consume(TokenType type)
+		{
+			if (m_token.type == type)
+			{
+				return vm::InterpretResult::CompileError;
+			}
+
+			m_token = m_lexer.getNextToken();
+			return vm::InterpretResult::CompileOk;
 		}
 
 		template<typename... Ts>
-		void emitBytes(Ts &&...args) requires IsByte<Ts...>
+		void emitBytes(Ts &&...args)
 		{
 			(m_chunk.write(args), ...);
 		}

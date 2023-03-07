@@ -39,6 +39,17 @@ namespace dialang::vm
 				break;
 			case OP_ADD: BIN_OP(+);	
 				break;
+			case OP_ADDI:
+				{
+					Value a = m_stack.pop();
+					int32_t b;
+
+					std::memcpy(&b, m_ip, sizeof(int32_t));
+					m_stack.push(a.as<int32_t>() + b);
+
+					m_ip += sizeof(int32_t);
+				}
+				break;
 			case OP_SUB: BIN_OP(-);
 				break;
 			case OP_MUL: BIN_OP(*);

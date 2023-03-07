@@ -1,6 +1,6 @@
-const global: i32 = 10
+let global = 10
 
-let main: fn() -> void
+let main: fn()
 {
-    let x = global + 12
+    global = 13    
 }

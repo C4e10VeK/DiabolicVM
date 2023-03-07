@@ -2,22 +2,22 @@
 #define DVM_PARSER_HPP
 
 #include "Lexer.hpp"
-#include "ast/ASTreeNodeBase.hpp"
 
 namespace dialang
 {
-	class Parser
-	{
-	private:
-		Lexer m_lexer;
-	public:
-		Parser() = default;
-		Parser(std::string code);
+    class Parser
+    {
+    private:
+        Lexer m_lexer;
+        Token m_current;
+        Token m_prev;
+    public:
 
-		void setCode(const std::string &code);
+        Parser() = default;
+        Parser(std::string code);
 
-		ASTreeNode parse();
-	};
+        void setSourceCode(const std::string &code);
+    };
 }
 
 #endif // DVM_PARSER_HPP

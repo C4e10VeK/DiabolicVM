@@ -48,32 +48,32 @@ namespace dialang
 			return true;
 		}
 
-		vm::InterpretResult compile()
+		bool compile()
 		{
 			while (!m_lexer.isEnd())
 			{
 				m_token = m_lexer.getNextToken();
 			}
 
-			return vm::InterpretResult::CompileOk;
+			return true;
 		}
 
 	private:
 
-		vm::InterpretResult compileExpr()
+		bool compileExpr()
 		{
-			return vm::InterpretResult::CompileOk;
+			return true;
 		}
 
-		vm::InterpretResult consume(TokenType type)
+		bool consume(TokenType type)
 		{
 			if (m_token.type == type)
 			{
-				return vm::InterpretResult::CompileError;
+				return false;
 			}
 
 			m_token = m_lexer.getNextToken();
-			return vm::InterpretResult::CompileOk;
+			return true;
 		}
 
 		template<typename... Ts>

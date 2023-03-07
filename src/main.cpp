@@ -5,15 +5,9 @@ int main()
 {
 	dialang::vm::Chunk chunk;
 
-	int32_t constId = chunk.addConstant("Hello world!");
+	int32_t constId = chunk.addConstant(10);
 	chunk.write(dialang::vm::OP_CONST);
 	chunk.write(constId);
-
-	constId = chunk.addConstant(" Hello streamer!");
-	chunk.write(dialang::vm::OP_CONST);
-	chunk.write(constId);
-
-	chunk.write(dialang::vm::OP_CONCAT);
 
 	chunk.write(dialang::vm::OP_PRINT);
 

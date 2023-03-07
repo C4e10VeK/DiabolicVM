@@ -2,6 +2,8 @@
 #define DVM_UTILS_HPP
 
 #include <string>
+#include <filesystem>
+#include <fstream>
 
 namespace dialang::utils
 {

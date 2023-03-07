@@ -14,6 +14,7 @@ namespace dialang::vm
 		OP_GETG,
 		OP_SETG,
 		OP_ADD,
+		OP_ADDI,
 		OP_SUB,
 		OP_MUL,
 		OP_DIV,

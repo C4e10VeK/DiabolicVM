@@ -40,10 +40,9 @@ namespace dialang::vm
 		}
 	};
 
-	enum class InterpretResult
+	enum class InterpretResult : uint8_t
 	{
 		Ok,
-		CompileOk,
 		CompileError,
 		RuntimeError,
 	};

@@ -1,6 +1,7 @@
 #ifndef DVM_ASTREENODES_HPP
 #define DVM_ASTREENODES_HPP
 
+#include <variant>
 #include "ASTreeNodeBase.hpp"
 #include "../Token.hpp"
 
@@ -60,13 +61,13 @@ namespace dialang
 		}
 	};
 
-	class ASTreeConstNode : public ASTreeNodeBase
+	class ASTreeVarDeclNode : public ASTreeNodeBase
 	{
 	private:
 		Token m_token;
 	public:
 
-		ASTreeConstNode() : ASTreeNodeBase(ASTreeNodeType::Const) { }
+		ASTreeVarDeclNode() : ASTreeNodeBase(ASTreeNodeType::Const) { }
 
 		void analyze() override
 		{

@@ -1,6 +1,6 @@
 let global = 10
 
-let main: fn()
+let main: fn = ()
 {
-    global = 13    
+	global = 13
 }

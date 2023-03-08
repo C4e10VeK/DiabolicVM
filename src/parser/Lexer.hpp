@@ -25,6 +25,7 @@ namespace dialang
 
 	private:
 		void skipWhiteSpace();
+		Token number();
 		bool match(char c);
 	};
 

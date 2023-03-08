@@ -6,7 +6,7 @@ int main()
 	dialang::vm::Chunk chunk;
 
 	int32_t constId = chunk.addConstant(10);
-	chunk.write(dialang::vm::OP_CONST);
+	chunk.write(dialang::vm::OP_PUSHC);
 	chunk.write(constId);
 
 	chunk.write(dialang::vm::OP_PRINT);

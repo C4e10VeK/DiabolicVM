@@ -50,36 +50,28 @@ namespace dialang
 
 		bool compile()
 		{
-			while (!m_lexer.isEnd())
-			{
-				m_token = m_lexer.getNextToken();
-			}
-
+			emitBytes(vm::OP_RET);
 			return true;
 		}
 
 	private:
 
-		bool compileExpr()
-		{
-			return true;
-		}
-
-		bool consume(TokenType type)
-		{
-			if (m_token.type == type)
-			{
-				return false;
-			}
-
-			m_token = m_lexer.getNextToken();
-			return true;
-		}
-
 		template<typename... Ts>
 		void emitBytes(Ts &&...args)
 		{
 			(m_chunk.write(args), ...);
+		}
+
+		void emitConstant(vm::Value value)
+		{
+			int32_t constId = m_chunk.addConstant(value);
+			if (constId > std::numeric_limits<uint8_t>::max())
+			{
+				std::cerr << "Too many constants" << std::endl;
+				return;
+			}
+
+			emitBytes(vm::OP_PUSHC, constId);
 		}
 	};
 }

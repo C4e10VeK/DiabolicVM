@@ -11,10 +11,6 @@ namespace dialang
 	{
 		TOKEN_NONE = -1,
 
-		TOKEN_NUMBER,
-		TOKEN_STRING,
-		TOKEN_NULL,
-
 		TOKEN_LPAREN,
 		TOKEN_RPAREN,
 		TOKEN_LBRACE,
@@ -33,6 +29,10 @@ namespace dialang
 		TOKEN_LET,
 		TOKEN_FUNCTION,
 		TOKEN_RETURN,
+
+		TOKEN_NUMBER,
+		TOKEN_STRING,
+		TOKEN_NULL,
 		
 		TOKEN_ID,
 		TOKEN_EOF

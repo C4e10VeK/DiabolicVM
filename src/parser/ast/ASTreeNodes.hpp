@@ -12,9 +12,15 @@ namespace dialang
 	private:
 		ASTreeNode m_left;
 		ASTreeNode m_right;
+		Token m_name;
 	public:
 
 		ASTreeBinNode() : ASTreeNodeBase(ASTreeNodeType::Bin) { }
+		ASTreeBinNode(ASTreeNode left, ASTreeNode right, Token token)
+			: ASTreeNodeBase(ASTreeNodeType::Bin),
+			  m_left(left),
+			  m_right(right),
+			  m_name(token) { }
 
 		ASTreeNode getLeft() const
 		{
@@ -41,9 +47,14 @@ namespace dialang
 	{
 	private:
 		ASTreeNode m_children;
+		Token m_name;
 	public:
 
 		ASTreeUnNode() : ASTreeNodeBase(ASTreeNodeType::Un) { }
+		ASTreeUnNode(ASTreeNode node, Token token)
+			: ASTreeNodeBase(ASTreeNodeType::Un),
+			  m_children(node),
+			  m_name(token) { }
 
 		ASTreeNode getChildren() const
 		{
@@ -61,13 +72,32 @@ namespace dialang
 		}
 	};
 
+	class ASTreeNumberNode : public ASTreeNodeBase
+	{
+	private:
+		Token m_number;
+	public:
+		ASTreeNumberNode() = default;
+		ASTreeNumberNode(Token token) : m_number(token) { }
+
+		void analyze() override
+		{
+
+		}
+
+		void compile() override
+		{
+
+		}
+	};
+
 	class ASTreeVarDeclNode : public ASTreeNodeBase
 	{
 	private:
 		Token m_token;
 	public:
 
-		ASTreeVarDeclNode() : ASTreeNodeBase(ASTreeNodeType::Const) { }
+		ASTreeVarDeclNode() : ASTreeNodeBase(ASTreeNodeType::VarDecl) { }
 
 		void analyze() override
 		{

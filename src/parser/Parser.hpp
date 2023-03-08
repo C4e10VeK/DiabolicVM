@@ -1,7 +1,9 @@
 #ifndef DVM_PARSER_HPP
 #define DVM_PARSER_HPP
 
+#include <vector>
 #include "Lexer.hpp"
+#include "ast/ASTreeNodeBase.hpp"
 
 namespace dialang
 {
@@ -17,6 +19,16 @@ namespace dialang
         Parser(std::string code);
 
         void setSourceCode(const std::string &code);
+		std::vector<ASTreeNode> parse();
+
+	private:
+		void advance();
+		void consume(TokenType type);
+
+		ASTreeNode parseExpression();
+		ASTreeNode parseUnary();
+		ASTreeNode parseFactor();
+		ASTreeNode parseTerm();
     };
 }
 

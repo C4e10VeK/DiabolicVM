@@ -54,13 +54,7 @@ namespace dialang
 
 		if (isDigit(m_code[m_pos]))
 		{
-			std::string number;
-			while (isDigit(m_code[m_pos]))
-			{
-				number.push_back(m_code[m_pos++]);
-			}
-
-			return Token(number, TOKEN_NUMBER);
+			return number();
 		}
 
 		switch (m_code[m_pos++])
@@ -68,7 +62,13 @@ namespace dialang
 		case '+':
 			return Token("+", TOKEN_PLUS);
 		case '-':
-			return Token("-", TOKEN_MINUS);
+			{
+				if (isDigit(m_code[m_pos]))
+				{
+					return number();	
+				}
+				return Token("-", TOKEN_MINUS);
+			}
 		case '*':
 			return Token("*", TOKEN_STAR);
 		case '/':
@@ -104,6 +104,17 @@ namespace dialang
 	{
 		while (isSpace(m_code[m_pos]))
 			++m_pos;
+	}
+
+	Token Lexer::number()
+	{
+		std::string number;
+		while (isDigit(m_code[m_pos]))
+		{
+			number.push_back(m_code[m_pos++]);
+		}
+
+		return Token(number, TOKEN_NUMBER);
 	}
 
 	bool Lexer::match(char c)

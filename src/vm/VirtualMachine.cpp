@@ -1,6 +1,6 @@
 #include "VirtualMachine.hpp"
 
-
+#include <cstring>
 #include "OpCodes.hpp"
 
 #define RUNTIME_ERROR(message) ({\
@@ -31,10 +31,20 @@ namespace dialang::vm
 				break;
 			case OP_RET:
 				return InterpretResult::Ok;
-			case OP_CONST:
+			case OP_PUSHC:
 				{
 					Value value = m_chunk->getConstant(*m_ip++);
 					m_stack.push(value);
+				}
+				break;
+			case OP_PUSHI:
+				{
+					int32_t value;
+					std::memcpy(&value, m_ip, sizeof(int32_t));
+
+					m_stack.push(value);
+
+					m_ip += sizeof(int32_t);
 				}
 				break;
 			case OP_ADD: BIN_OP(+);	

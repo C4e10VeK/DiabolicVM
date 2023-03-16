@@ -1,0 +1,15 @@
+let printAdd: fn(a: i32, b: i32)
+{
+	print a + b
+}
+
+let add: fn(a: i32, b: i32) -> i32
+{
+	return a + b
+}
+
+let main: fn()
+{
+	let t1 = add(5, 4)
+	printAdd(5, 4)
+}

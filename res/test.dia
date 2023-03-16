@@ -1,6 +1,0 @@
-let global = 10
-
-let main: fn = ()
-{
-	global = 13
-}

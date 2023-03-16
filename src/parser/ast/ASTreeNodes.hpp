@@ -91,13 +91,26 @@ namespace dialang
 		}
 	};
 
+	enum class VarType
+	{
+		Integer32,
+		Boolean,
+		String
+	};
+
 	class ASTreeVarDeclNode : public ASTreeNodeBase
 	{
 	private:
 		Token m_token;
+		VarType m_type;
+		ASTreeNode m_init;
 	public:
 
 		ASTreeVarDeclNode() : ASTreeNodeBase(ASTreeNodeType::VarDecl) { }
+		ASTreeVarDeclNode(Token token, VarType type)
+			: ASTreeNodeBase(ASTreeNodeType::VarDecl),
+			  m_token(token),
+			  m_type(type) { }
 
 		void analyze() override
 		{

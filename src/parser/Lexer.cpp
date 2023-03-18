@@ -11,6 +11,7 @@ namespace dialang
 		case '\r':
 		case '\t':
 		case '\v':
+		case '\n':
 			return true;
 		default:
 			break;
@@ -39,22 +40,31 @@ namespace dialang
 	void Lexer::setCode(const std::string &code)
 	{
 		m_code = code;
+		m_pos = 0;
 		m_line = 1;
 	}
 
 	Token Lexer::getNextToken()
 	{
-		if (m_code[m_pos] == '\n')
-		{
-			++m_line;
-			++m_pos;
-		}
-
 		skipWhiteSpace();
 
 		if (isDigit(m_code[m_pos]))
 		{
 			return number();
+		}
+
+		if (isLetter(m_code[m_pos]))
+		{
+			std::string letter;
+			while (!isSpace(m_code[m_pos]) && isLetter(m_code[m_pos]) || isDigit(m_code[m_pos]))
+			{
+				letter.push_back(m_code[m_pos++]);
+			}
+
+			if (letter == "let")
+				return Token(letter, TOKEN_LET);
+
+			return Token(letter, TOKEN_ID);
 		}
 
 		switch (m_code[m_pos++])

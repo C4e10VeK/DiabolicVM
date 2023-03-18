@@ -4,6 +4,7 @@
 #include <string>
 #include <filesystem>
 #include <fstream>
+#include <streambuf>
 
 namespace dialang::utils
 {
@@ -29,6 +30,17 @@ namespace dialang::utils
 	inline std::string toString<int64_t>(int64_t value)
 	{
 		return std::to_string(value);
+	}
+
+	inline std::string readFile(const std::filesystem::path &path)
+	{
+		std::ifstream file(path);
+
+		std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+		file.close();
+
+		return text;
 	}
 }
 

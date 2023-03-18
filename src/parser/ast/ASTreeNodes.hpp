@@ -107,10 +107,12 @@ namespace dialang
 	public:
 
 		ASTreeVarDeclNode() : ASTreeNodeBase(ASTreeNodeType::VarDecl) { }
-		ASTreeVarDeclNode(Token token, VarType type)
+		ASTreeVarDeclNode(Token token, VarType type, ASTreeNode init)
 			: ASTreeNodeBase(ASTreeNodeType::VarDecl),
 			  m_token(token),
-			  m_type(type) { }
+			  m_type(type),
+			  m_init()
+		{ }
 
 		void analyze() override
 		{
@@ -123,6 +125,12 @@ namespace dialang
 		}
 
 	};
+
+	template<class Node, typename ...Args>
+	inline ASTreeNode makeNode(Args ...args)
+	{
+		return std::make_shared<Node>(args...);
+	}
 }
 
 #endif // DVM_ASTREENODES_HPP

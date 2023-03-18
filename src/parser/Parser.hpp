@@ -25,10 +25,13 @@ namespace dialang
 		void advance();
 		void consume(TokenType type);
 
+		ASTreeNode parseStatement();
 		ASTreeNode parseExpression();
 		ASTreeNode parseUnary();
 		ASTreeNode parseFactor();
 		ASTreeNode parseTerm();
+
+		ASTreeNode parseVarDecl();
     };
 }
 

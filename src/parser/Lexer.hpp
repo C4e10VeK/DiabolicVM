@@ -11,8 +11,8 @@ namespace dialang
 	{
 	private:
 		std::string m_code;
-		size_t m_pos;
-		int32_t m_line;
+		int32_t m_pos = 0;
+		int32_t m_line = 0;
 	public:
 		Lexer() = default;
 		Lexer(std::string code);

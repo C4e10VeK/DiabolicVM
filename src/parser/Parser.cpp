@@ -1,4 +1,5 @@
 #include "Parser.hpp"
+#include <unordered_map>
 #include "ast/ASTreeNodes.hpp"
 
 namespace dialang
@@ -12,9 +13,10 @@ namespace dialang
 
 	std::vector<ASTreeNode> Parser::parse()
 	{
+		std::vector<ASTreeNode> program;
 		while (!m_lexer.isEnd())
 		{
-
+			program.emplace_back(parseStatement());
 		}
 
 		return {};
@@ -30,6 +32,18 @@ namespace dialang
 	{
 		if (m_current.type == type)
 			advance();
+	}
+
+	ASTreeNode Parser::parseStatement()
+	{
+		switch (m_current.type)
+		{
+		case TOKEN_LET:
+			return parseVarDecl();
+		default:
+			break;
+		}
+		return {};
 	}
 
 	ASTreeNode Parser::parseExpression()
@@ -48,7 +62,7 @@ namespace dialang
 		case TOKEN_MINUS:
 			{
 				consume(TOKEN_MINUS);
-				res = std::make_shared<ASTreeUnNode>(res, token);
+				res = makeNode<ASTreeUnNode>(res, token);
 			}
 		default:
 			break;
@@ -66,7 +80,7 @@ namespace dialang
 			Token token = m_current;
 			consume(token.type);
 
-			res = std::make_shared<ASTreeBinNode>(res, parseUnary(), token);
+			res = makeNode<ASTreeBinNode>(res, parseUnary(), token);
 		}
 
 		return res;
@@ -81,10 +95,44 @@ namespace dialang
 			Token token = m_current;
 			consume(token.type);
 
-			res = std::make_shared<ASTreeBinNode>(res, parseFactor(), token);
+			res = makeNode<ASTreeBinNode>(res, parseFactor(), token);
 		}
 
 		return res;
+	}
+
+	ASTreeNode Parser::parseVarDecl()
+	{
+		const std::unordered_map<std::string, VarType> strsTypes = {
+			{"i32", VarType::Integer32},
+			{"bool", VarType::Boolean},
+			{"string", VarType::String}
+		};
+		
+
+		consume(TOKEN_LET);
+		Token id = m_current;
+		consume(TOKEN_ID);
+	
+		VarType type = VarType::Integer32;
+
+		if (m_current.type == TOKEN_COLON)
+		{
+			consume(TOKEN_COLON);
+			if (!strsTypes.contains(m_current.value))
+			{
+
+			}
+			else
+			{
+				type = strsTypes.at(m_current.value);
+			}
+
+			consume(TOKEN_ID);
+		}
+
+
+		return makeNode<ASTreeVarDeclNode>(id, type, parseExpression());
 	}
 
 }

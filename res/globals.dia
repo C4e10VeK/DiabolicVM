@@ -1,4 +1,3 @@
-let global = 10 // default i32
-let str = "Hello world!" // string type
+let global = 10
 let typedVar: i32 = 50
 let empryVar

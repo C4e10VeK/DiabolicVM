@@ -1,53 +1,104 @@
 #ifndef DVM_OBJECT_HPP
 #define DVM_OBJECT_HPP
 
-#include <functional>
-#include <string>
-#include <type_traits>
-#include "../utils.hpp"
+#include "Value.hpp"
+#include <stdint.h>
+#include <vcruntime.h>
 
 namespace dialang::vm
 {
 
-	struct BaseObject
+	enum class ObjectType
 	{
-		enum class Type
-		{
-			TYPE_STRING,
-			TYPE_FUNCTION
-		};
+		Single,
+		Array
+	};
 
-		Type type_;
-
-		BaseObject() = default;
-
-		BaseObject(Type type) : type_(type) { }
-
+	class BaseObject
+	{
+	public:
 		virtual ~BaseObject() = default;
+		virtual std::string getObjectName() const;
 
-		virtual std::string toString() = 0;
-	};	
-
-	template<typename T, BaseObject::Type ObjType>
-	struct BaseObjectGen : public BaseObject
-	{
-		T value_;
-
-		BaseObjectGen() : BaseObject(ObjType) { }
-		BaseObjectGen(T value) : BaseObject(ObjType), value_(value) { }
-
-		std::string toString() override
+		template<class T>
+		inline bool is()
 		{
-			return utils::toString(value_);
+			return dynamic_cast<T *>(this);
+		}
+
+		template<class T>
+		inline T &as()
+		{
+			return reinterpret_cast<T &>(this);
 		}
 	};
 
-	using StringObject = BaseObjectGen<std::string, BaseObject::Type::TYPE_STRING>;
-
-	inline StringObject operator+(const StringObject &lhs, const StringObject &rhs)
+	template<class T>
+	class BaseObjectGen : public BaseObject
 	{
-		return StringObject(lhs.value_ + rhs.value_);
-	}
+	private:
+		T m_value;
+	public:
+
+		inline std::string getObjectName() const override
+		{
+			return typeid(T).name();
+		}
+
+		inline const T &get() const
+		{
+			return m_value;
+		}
+
+		inline T &get()
+		{
+			return m_value;
+		}
+	};
+
+	class ObjectArray : public BaseObject
+	{
+	private:
+		Value *m_array;
+		size_t m_size;
+		const ObjectType m_type = ObjectType::Array;
+	public:
+		ObjectArray() = default;
+		ObjectArray(size_t size)
+			: m_array(new Value[size]),
+			  m_size(size) 
+		{ }
+
+		~ObjectArray()
+		{
+			delete[] m_array;
+		}
+
+		inline ObjectType getType() const
+		{
+			return m_type;
+		}
+
+		inline std::string getObjectName() const override
+		{
+			return "";
+		}
+
+		inline size_t getSize() const
+		{
+			return m_size;
+		}
+
+		inline const Value &operator[](size_t n) const
+		{
+			return m_array[n];
+		}
+
+		inline Value &operator[](size_t n)
+		{
+			return m_array[n];
+		}
+	};
 }
 
 #endif // DVM_OBJECT_HPP

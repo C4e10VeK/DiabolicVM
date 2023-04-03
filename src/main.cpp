@@ -1,18 +1,32 @@
 #include "vm/VirtualMachine.hpp"
 #include "vm/OpCodes.hpp"
-#include "parser/Lexer.hpp"
+#include "vm/Compiler.hpp"
+#include "parser/Parser.hpp"
+#include "utils.hpp"
 
 int main()
 {
-	dialang::Lexer lexer;
+	dialang::Parser parser;
 
-	lexer.setCode(dialang::utils::readFile("../res/globals.dia"));
-	std::vector<dialang::Token> tokens;
+	std::string code;
 
-	while (!lexer.isEnd())
+	if (!dialang::utils::readFile("../res/globals.dia", code))
 	{
-		tokens.emplace_back(lexer.getNextToken());
+		return 1;
 	}
+	dialang::Compiler compiler(code);
+	auto res = compiler.compile();
+
+
+
+	// parser.setSourceCode(code);
+
+	// auto res = parser.parse();
+
+	// for (const auto &node : res)
+	// {
+	// 	node->take(compiler);
+	// }
 
 	// dialang::vm::Chunk chunk;
 
@@ -24,8 +38,8 @@ int main()
 
 	// chunk.write(dialang::vm::OP_RET);
 
-	// dialang::vm::VM vm;
-	// vm.interpret(chunk);
+	dialang::vm::VM vm;
+	vm.interpret(res);
 
 	return 0;
 }

@@ -32,15 +32,21 @@ namespace dialang::utils
 		return std::to_string(value);
 	}
 
-	inline std::string readFile(const std::filesystem::path &path)
+	inline bool readFile(const std::filesystem::path &path, std::string &text)
 	{
+		if (!std::filesystem::exists(path))
+			return false;
+
 		std::ifstream file(path);
 
-		std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		if (!file.is_open())
+			return false;
+
+		text = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
 		file.close();
 
-		return text;
+		return true;
 	}
 }
 

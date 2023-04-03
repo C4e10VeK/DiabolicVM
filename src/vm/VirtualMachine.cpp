@@ -47,6 +47,20 @@ namespace dialang::vm
 					m_ip += sizeof(int32_t);
 				}
 				break;
+			case OP_GETG:
+				{
+					auto value = m_chunk->getConstant(*m_ip++);
+
+					m_stack.push(m_globals[value.as<std::string>()]);
+				}
+				break;
+			case OP_SETG:
+				{
+					auto value = m_chunk->getConstant(*m_ip++);
+
+					m_globals[value.as<std::string>()] = m_stack.pop();
+				}
+				break;
 			case OP_ADD: BIN_OP(+);	
 				break;
 			case OP_ADDI:
@@ -82,7 +96,7 @@ namespace dialang::vm
 					Value b = m_stack.pop();
 					Value a = m_stack.pop();
 
-					if (!a.is<std::string>() && b.is<std::string>())
+					if (!a.is<std::string>() || !b.is<std::string>())
 					{
 						return RUNTIME_ERROR("Only string support concat");
 					}
@@ -97,8 +111,7 @@ namespace dialang::vm
 				}
 				break;
 			default:
-				std::cerr << "Unknown operation!" << std::endl;
-				return InterpretResult::RuntimeError;
+				return RUNTIME_ERROR("Unknown operation!");
 			}
 		}
 

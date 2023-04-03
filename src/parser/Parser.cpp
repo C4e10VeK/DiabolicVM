@@ -14,12 +14,13 @@ namespace dialang
 	std::vector<ASTreeNode> Parser::parse()
 	{
 		std::vector<ASTreeNode> program;
+		advance();
 		while (!m_lexer.isEnd())
 		{
 			program.emplace_back(parseStatement());
 		}
 
-		return {};
+		return program;
 	}
 
 	void Parser::advance()
@@ -41,29 +42,36 @@ namespace dialang
 		case TOKEN_LET:
 			return parseVarDecl();
 		default:
-			break;
+			return parseExpression();
 		}
 		return {};
 	}
 
 	ASTreeNode Parser::parseExpression()
 	{
-		return {};
+		return parseTerm();
 	}
 
 	ASTreeNode Parser::parseUnary()
 	{
 		Token token = m_current;
 
-		ASTreeNode res = parseExpression();
+		ASTreeNode res;
 
 		switch (token.type)
 		{
 		case TOKEN_MINUS:
 			{
 				consume(TOKEN_MINUS);
-				res = makeNode<ASTreeUnNode>(res, token);
+				res = makeNode<ASTreeUnNode>(parseExpression(), token);
 			}
+			break;
+		case TOKEN_NUMBER:
+			{
+				consume(TOKEN_NUMBER);
+				res = makeNode<ASTreeNumberNode>(token);
+			}
+			break;
 		default:
 			break;
 		}
@@ -131,6 +139,10 @@ namespace dialang
 			consume(TOKEN_ID);
 		}
 
+		if (m_current.type != TOKEN_EQUAL)
+			return makeNode<ASTreeVarDeclNode>(id, type, ASTreeNode());
+			
+		consume(TOKEN_EQUAL);
 
 		return makeNode<ASTreeVarDeclNode>(id, type, parseExpression());
 	}

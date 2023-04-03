@@ -7,54 +7,37 @@
 #include <type_traits>
 #include "OpCodes.hpp"
 #include "VirtualMachine.hpp"
-#include "../parser/Lexer.hpp"
+#include "../parser/Parser.hpp"
 
 namespace dialang
 {
+	enum class VarType
+	{
+		Integer32,
+		Boolean,
+		String
+	};
+
+	struct CompileState
+	{
+		VarType varDeclarationType;
+		int32_t localCount;
+		int32_t scopeDepth;
+	};
 
 	class Compiler
 	{
 	private:
-		Lexer m_lexer;
-		Token m_token;
+		Parser m_parser;
 		vm::Chunk m_chunk;
+		CompileState m_state;
 	public:
 		Compiler() = default;
-		Compiler(std::string code) : m_lexer(std::move(code)) { }
+		Compiler(std::string code);
 
-		bool openFile(const std::filesystem::path &path)
-		{
-			std::ifstream f;
-			std::string text;
-			
-			if (!std::filesystem::exists(path))
-				return false;
+		bool openFile(const std::filesystem::path &path);
 
-			f.open(path, std::ios::binary);
-
-			if (!f.is_open())
-				return false;
-			
-			f.seekg(0, std::ios::end);
-			text.reserve(f.tellg());
-			f.seekg(0, std::ios::beg);
-
-			text.assign((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
-
-			f.close();
-
-			m_lexer.setCode(text);
-
-			return true;
-		}
-
-		bool compile()
-		{
-			emitBytes(vm::OP_RET);
-			return true;
-		}
-
-	private:
+		vm::Chunk compile();
 
 		template<typename... Ts>
 		void emitBytes(Ts &&...args)
@@ -62,17 +45,11 @@ namespace dialang
 			(m_chunk.write(args), ...);
 		}
 
-		void emitConstant(vm::Value value)
-		{
-			int32_t constId = m_chunk.addConstant(value);
-			if (constId > std::numeric_limits<uint8_t>::max())
-			{
-				std::cerr << "Too many constants" << std::endl;
-				return;
-			}
+		void emitConstant(vm::Value value);
+		uint8_t emitIdConst(const std::string &id);
 
-			emitBytes(vm::OP_PUSHC, constId);
-		}
+		void setState(CompileState state);
+		CompileState &getState();
 	};
 }
 

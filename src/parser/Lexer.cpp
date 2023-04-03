@@ -1,4 +1,5 @@
 #include "Lexer.hpp"
+#include <unordered_map>
 
 namespace dialang
 {
@@ -55,16 +56,7 @@ namespace dialang
 
 		if (isLetter(m_code[m_pos]))
 		{
-			std::string letter;
-			while (!isSpace(m_code[m_pos]) && isLetter(m_code[m_pos]) || isDigit(m_code[m_pos]))
-			{
-				letter.push_back(m_code[m_pos++]);
-			}
-
-			if (letter == "let")
-				return Token(letter, TOKEN_LET);
-
-			return Token(letter, TOKEN_ID);
+			return letter();
 		}
 
 		switch (m_code[m_pos++])
@@ -75,7 +67,9 @@ namespace dialang
 			{
 				if (isDigit(m_code[m_pos]))
 				{
-					return number();	
+					Token res = number();
+					res.value = '-' + res.value;
+					return res;
 				}
 				return Token("-", TOKEN_MINUS);
 			}
@@ -125,6 +119,27 @@ namespace dialang
 		}
 
 		return Token(number, TOKEN_NUMBER);
+	}
+
+	Token Lexer::letter()
+	{
+		static const std::unordered_map<std::string, Token> keywords = {
+			{"let", {"let", TOKEN_LET}},
+			{"const", {"const", TOKEN_CONST}},
+			{"fn", {"fn", TOKEN_FUNCTION}},
+			{"return", {"return", TOKEN_RETURN}},
+		};
+
+		std::string letter;
+		while (!isSpace(m_code[m_pos]) && isLetter(m_code[m_pos]) || isDigit(m_code[m_pos]))
+		{
+			letter.push_back(m_code[m_pos++]);
+		}
+
+		if (keywords.contains(letter))
+			return keywords.at(letter);
+
+		return Token(letter, TOKEN_ID);
 	}
 
 	bool Lexer::match(char c)

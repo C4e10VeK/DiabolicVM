@@ -1,9 +1,11 @@
 #ifndef DVM_ASTREENODES_HPP
 #define DVM_ASTREENODES_HPP
 
+#include <type_traits>
 #include <variant>
 #include "ASTreeNodeBase.hpp"
 #include "../Token.hpp"
+#include "../../vm/Compiler.hpp"
 
 namespace dialang
 {
@@ -32,16 +34,40 @@ namespace dialang
 			return m_right;
 		}
 		
-		void analyze() override
+		void take(Compiler &compiler) override
 		{
+			m_left->take(compiler);
+			m_right->take(compiler);
 
+			switch (m_name.type)
+			{
+			case TOKEN_PLUS:
+				compiler.emitBytes(vm::OP_ADD);
+				break;
+			case TOKEN_MINUS:
+				compiler.emitBytes(vm::OP_SUB);
+				break;
+			case TOKEN_STAR:
+				compiler.emitBytes(vm::OP_MUL);
+				break;
+			case TOKEN_SLASH:
+				compiler.emitBytes(vm::OP_DIV);
+			default:
+				throw;
+			}
 		}
-
-		void compile() override
-		{
-
-		}
+		
 	};
+
+	template<typename F, typename ...Args>
+	static inline constexpr auto callIfCallable(F &&func, Args &&...args)
+	{
+		if constexpr (std::is_invocable_v<F, decltype(std::forward(args))...>)
+		{
+			return std::invoke(std::forward(func), std::forward<Args>(args)...);
+		}
+		else return;
+	}
 
 	class ASTreeUnNode : public ASTreeNodeBase
 	{
@@ -61,14 +87,10 @@ namespace dialang
 			return m_children;
 		}
 
-		void analyze() override
+		void take(Compiler &compiler) override
 		{
-			
-		}
-
-		void compile() override
-		{
-
+			m_children->take(compiler);
+			compiler.emitBytes(vm::OP_NEG);
 		}
 	};
 
@@ -80,22 +102,20 @@ namespace dialang
 		ASTreeNumberNode() = default;
 		ASTreeNumberNode(Token token) : m_number(token) { }
 
-		void analyze() override
+		void take(Compiler &compiler) override
 		{
-
+			switch (compiler.getState().varDeclarationType)
+			{
+            case VarType::Integer32:
+			{
+				int32_t val = std::stoi(m_number.value);
+				compiler.emitConstant({val});
+				break;
+			}
+            default:
+				break;
+			}
 		}
-
-		void compile() override
-		{
-
-		}
-	};
-
-	enum class VarType
-	{
-		Integer32,
-		Boolean,
-		String
 	};
 
 	class ASTreeVarDeclNode : public ASTreeNodeBase
@@ -111,19 +131,20 @@ namespace dialang
 			: ASTreeNodeBase(ASTreeNodeType::VarDecl),
 			  m_token(token),
 			  m_type(type),
-			  m_init()
+			  m_init(init)
 		{ }
 
-		void analyze() override
+		void take(Compiler &compiler) override
 		{
+			CompileState &state = compiler.getState();
+			state.varDeclarationType = m_type;
+
+			if (m_init)
+				m_init->take(compiler);
 			
+			uint8_t id = compiler.emitIdConst(m_token.value);
+			compiler.emitBytes(vm::OP_SETG, id);
 		}
-
-		void compile() override
-		{
-
-		}
-
 	};
 
 	template<class Node, typename ...Args>

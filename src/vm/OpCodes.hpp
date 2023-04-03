@@ -29,6 +29,9 @@ namespace dialang::vm
 
 		OPS_COUNT
 	};
+
+	constexpr uint8_t CONST_BLOCK_BEGIN = OPS_COUNT + 1;
+	constexpr uint8_t CONST_BLOCK_END = CONST_BLOCK_BEGIN + 1;
 }
 
 #endif // DVM_INSTRUCTION_HPP

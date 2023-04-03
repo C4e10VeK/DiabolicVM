@@ -3,16 +3,19 @@
 
 #include <iostream>
 #include <cstdint>
+#include <memory>
 #include <variant>
-#include "Object.hpp"
 
 namespace dialang::vm
 {
-	using ValueType = std::variant<int32_t, bool, std::monostate, std::string>;
+	class BaseObject;
+
+	using Object = std::shared_ptr<BaseObject>;
+	using ValueVariant = std::variant<uint64_t, int32_t, double, bool, std::monostate, std::string, Object>;
 
 	struct Value
 	{
-		ValueType value_;
+		ValueVariant value_;
 		Value() = default;
 		Value(std::string value);
 		Value(const char *value);

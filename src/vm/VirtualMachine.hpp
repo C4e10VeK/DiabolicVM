@@ -25,6 +25,15 @@ namespace dialang::vm
 
 		int32_t addConstant(Value value)
 		{
+			auto finded = std::find_if(m_constants.begin(), m_constants.end(), [=](const Value &_value){
+				return value.value_ == _value.value_;
+			});
+
+			if (finded != m_constants.end())
+			{
+				return std::distance(m_constants.begin(), finded);
+			}
+
 			m_constants.emplace_back(value);
 			return m_constants.size() - 1;
 		}
@@ -54,7 +63,6 @@ namespace dialang::vm
 		uint8_t *m_ip;
 		Stack<STACK_MAX> m_stack;
 		std::unordered_map<std::string, Value> m_globals;
-		std::unordered_map<std::string, Value> m_strings;
 	public:
 
 		InterpretResult interpret(Chunk &chunk);	

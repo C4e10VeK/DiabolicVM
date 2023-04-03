@@ -5,6 +5,7 @@
 
 namespace dialang
 {
+	class Compiler;
 	class ASTreeNodeBase;
 
 	template<typename T>
@@ -30,8 +31,7 @@ namespace dialang
 
 		inline ASTreeNodeType getType() const { return m_type; }
 
-		virtual void compile() = 0;
-		virtual void analyze() = 0;
+		virtual void take(Compiler &compiler) = 0;
 	};
 
 	using ASTreeNode = std::shared_ptr<ASTreeNodeBase>;

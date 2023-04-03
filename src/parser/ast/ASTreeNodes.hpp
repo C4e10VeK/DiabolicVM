@@ -112,6 +112,11 @@ namespace dialang
 				compiler.emitConstant({val});
 				break;
 			}
+			case VarType::String:
+			{
+				compiler.emitConstant({m_number.value});
+				break;
+			}
             default:
 				break;
 			}

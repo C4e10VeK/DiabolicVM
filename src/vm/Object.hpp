@@ -3,7 +3,6 @@
 
 #include "Value.hpp"
 #include <stdint.h>
-#include <vcruntime.h>
 
 namespace dialang::vm
 {

@@ -65,7 +65,23 @@ namespace dialang::vm
 		std::unordered_map<std::string, Value> m_globals;
 	public:
 
-		InterpretResult interpret(Chunk &chunk);	
+		InterpretResult interpret(Chunk &chunk);
+
+		inline void printGlobals()
+		{
+			std::cout << "global vars: " << std::endl;
+			for (const auto &g : m_globals)
+			{
+				std::cout << g.first << ": ";
+
+				if (g.second.is<int32_t>())
+					std::cout << g.second.as<int32_t>();
+				if (g.second.is<std::string>())
+					std::cout << g.second.as<std::string>();
+				
+				std::cout << std::endl;
+			}
+		}
 	};
 }
 

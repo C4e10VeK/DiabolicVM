@@ -92,6 +92,17 @@ namespace dialang
 								 : Token("=", TOKEN_EQUAL);
 		case '.':
 			return Token(".", TOKEN_DOT);
+		case '"':
+			{
+				std::string value;
+				while (m_code[m_pos] != '"')
+				{
+					char c = m_code[m_pos++];
+					value.push_back(c);
+				}
+				++m_pos;
+				return Token(value, TOKEN_STRING);
+			}
 		default:
 			break;
 		}

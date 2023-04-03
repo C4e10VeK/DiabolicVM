@@ -41,5 +41,7 @@ int main()
 	dialang::vm::VM vm;
 	vm.interpret(res);
 
+	vm.printGlobals();
+
 	return 0;
 }

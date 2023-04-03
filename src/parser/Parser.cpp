@@ -72,6 +72,12 @@ namespace dialang
 				res = makeNode<ASTreeNumberNode>(token);
 			}
 			break;
+		case TOKEN_STRING:
+			{
+				consume(TOKEN_STRING);
+				res = makeNode<ASTreeNumberNode>(token);
+			}
+			break;
 		default:
 			break;
 		}

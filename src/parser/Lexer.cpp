@@ -124,7 +124,7 @@ namespace dialang
 	Token Lexer::number()
 	{
 		std::string number;
-		while (isDigit(m_code[m_pos]))
+		while (isDigit(m_code[m_pos]) || m_code[m_pos] == '.')
 		{
 			number.push_back(m_code[m_pos++]);
 		}
@@ -139,6 +139,7 @@ namespace dialang
 			{"const", {"const", TOKEN_CONST}},
 			{"fn", {"fn", TOKEN_FUNCTION}},
 			{"return", {"return", TOKEN_RETURN}},
+			{"print", {"print", TOKEN_PRINT}}
 		};
 
 		std::string letter;

@@ -14,6 +14,8 @@ namespace dialang
 	enum class VarType
 	{
 		Integer32,
+		Float,
+		Double,
 		Boolean,
 		String
 	};
@@ -47,6 +49,9 @@ namespace dialang
 
 		void emitConstant(vm::Value value);
 		uint8_t emitIdConst(const std::string &id);
+
+		void beginBlock();
+		void endBlock();
 
 		void setState(CompileState state);
 		CompileState &getState();

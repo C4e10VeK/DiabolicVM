@@ -17,7 +17,7 @@ namespace dialang
 		Bin,
 		Un,
 		VarDecl,
-		Number
+		ConstVal
 	};
 
 	class ASTreeNodeBase : public std::enable_shared_from_this<ASTreeNodeBase>

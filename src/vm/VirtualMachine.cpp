@@ -16,10 +16,10 @@ namespace dialang::vm
 
 	#define BIN_OP(op) ({Value b = m_stack.pop(); \
 						Value a = m_stack.pop(); \
-						if (!a.isAny<int32_t>() && !b.isAny<int32_t>()){ \
+						if (!a.isAny<dvm_int, dvm_float>() && !b.isAny<dvm_int, dvm_float>()){ \
 							return RUNTIME_ERROR("Only number support "#op); \
 						} \
-						m_stack.push(a.as<int32_t>() op b.as<int32_t>());})
+						m_stack.push(a.as<dvm_int>() op b.as<dvm_int>());})
 
 		for(;;)
 		{
@@ -39,10 +39,10 @@ namespace dialang::vm
 				break;
 			case OP_PUSHI:
 				{
-					int32_t value;
+					dvm_int value;
 					std::memcpy(&value, m_ip, sizeof(int32_t));
 
-					m_stack.push(value);
+					m_stack.push({value});
 
 					m_ip += sizeof(int32_t);
 				}
@@ -69,7 +69,7 @@ namespace dialang::vm
 					int32_t b;
 
 					std::memcpy(&b, m_ip, sizeof(int32_t));
-					m_stack.push(a.as<int32_t>() + b);
+					m_stack.push(a.as<dvm_int>() + b);
 
 					m_ip += sizeof(int32_t);
 				}
@@ -88,7 +88,7 @@ namespace dialang::vm
 						return RUNTIME_ERROR("Only number support negative");
 					}
 
-					m_stack.push(-val.as<int32_t>());
+					m_stack.push(-val.as<dvm_int>());
 				}
 				break;
 			case OP_CONCAT:

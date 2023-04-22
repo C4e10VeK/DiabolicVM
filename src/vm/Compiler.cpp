@@ -39,6 +39,16 @@ namespace dialang
 		return m_chunk.addConstant({id});
 	}
 
+	void Compiler::beginBlock()
+	{
+
+	}
+
+	void Compiler::endBlock()
+	{
+		
+	}
+
 	void Compiler::setState(CompileState state)
 	{
 		m_state = state;

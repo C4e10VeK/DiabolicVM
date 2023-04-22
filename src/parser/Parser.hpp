@@ -32,6 +32,8 @@ namespace dialang
 		ASTreeNode parseTerm();
 
 		ASTreeNode parseVarDecl();
+        ASTreeNode parseGetVar();
+        ASTreeNode parsePrintStm();
     };
 }
 

@@ -3,3 +3,5 @@ let a: i32 = -5 * 10
 let b: i32 = -5 * 5 - 5 * 10
 
 let str: string = "hello world!"
+
+let floating: f32 = 2.65

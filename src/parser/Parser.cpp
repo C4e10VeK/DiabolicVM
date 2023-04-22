@@ -41,6 +41,8 @@ namespace dialang
 		{
 		case TOKEN_LET:
 			return parseVarDecl();
+		case TOKEN_PRINT:
+			return parsePrintStm();
 		default:
 			return parseExpression();
 		}
@@ -60,6 +62,13 @@ namespace dialang
 
 		switch (token.type)
 		{
+		case TOKEN_LPAREN:
+			{
+				consume(TOKEN_LPAREN);
+				res = parseExpression();
+				consume(TOKEN_RPAREN);
+			}
+			break;
 		case TOKEN_MINUS:
 			{
 				consume(TOKEN_MINUS);
@@ -69,15 +78,20 @@ namespace dialang
 		case TOKEN_NUMBER:
 			{
 				consume(TOKEN_NUMBER);
-				res = makeNode<ASTreeNumberNode>(token);
+				res = makeNode<ASTreeConstValNode>(token);
 			}
 			break;
 		case TOKEN_STRING:
 			{
 				consume(TOKEN_STRING);
-				res = makeNode<ASTreeNumberNode>(token);
+				res = makeNode<ASTreeConstValNode>(token);
 			}
 			break;
+		case TOKEN_ID:
+			{
+				consume(TOKEN_ID);
+				res = makeNode<ASTreeVarNode>(token);
+			}
 		default:
 			break;
 		}
@@ -119,6 +133,8 @@ namespace dialang
 	{
 		const std::unordered_map<std::string, VarType> strsTypes = {
 			{"i32", VarType::Integer32},
+			{"f32", VarType::Float},
+			{"f64", VarType::Double},
 			{"bool", VarType::Boolean},
 			{"string", VarType::String}
 		};
@@ -151,6 +167,20 @@ namespace dialang
 		consume(TOKEN_EQUAL);
 
 		return makeNode<ASTreeVarDeclNode>(id, type, parseExpression());
+	}
+
+	ASTreeNode Parser::parseGetVar()
+	{
+		Token id = m_current;
+		consume(TOKEN_ID);
+
+		return makeNode<ASTreeVarNode>(id);
+	}
+
+	ASTreeNode Parser::parsePrintStm()
+	{
+		consume(TOKEN_PRINT);
+		return  makeNode<ASTreePrintStmNode>(parseExpression());
 	}
 
 }

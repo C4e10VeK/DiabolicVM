@@ -76,6 +76,8 @@ namespace dialang::vm
 
 				if (g.second.is<int32_t>())
 					std::cout << g.second.as<int32_t>();
+				if (g.second.is<float>())
+					std::cout << g.second.as<float>();
 				if (g.second.is<std::string>())
 					std::cout << g.second.as<std::string>();
 				

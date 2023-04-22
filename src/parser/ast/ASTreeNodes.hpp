@@ -59,16 +59,6 @@ namespace dialang
 		
 	};
 
-	template<typename F, typename ...Args>
-	static inline constexpr auto callIfCallable(F &&func, Args &&...args)
-	{
-		if constexpr (std::is_invocable_v<F, decltype(std::forward(args))...>)
-		{
-			return std::invoke(std::forward(func), std::forward<Args>(args)...);
-		}
-		else return;
-	}
-
 	class ASTreeUnNode : public ASTreeNodeBase
 	{
 	private:
@@ -94,30 +84,40 @@ namespace dialang
 		}
 	};
 
-	class ASTreeNumberNode : public ASTreeNodeBase
+	class ASTreeConstValNode : public ASTreeNodeBase
 	{
 	private:
-		Token m_number;
+		Token m_const;
 	public:
-		ASTreeNumberNode() = default;
-		ASTreeNumberNode(Token token) : m_number(token) { }
+		ASTreeConstValNode() = default;
+		ASTreeConstValNode(Token token)
+			: ASTreeNodeBase(ASTreeNodeType::ConstVal),
+			  m_const(token) { }
 
 		void take(Compiler &compiler) override
 		{
-			switch (compiler.getState().varDeclarationType)
+			switch (m_const.type)
 			{
-            case VarType::Integer32:
+			case TOKEN_NUMBER:
 			{
-				int32_t val = std::stoi(m_number.value);
+				if (m_const.value.find('.') != std::string::npos)
+				{
+					vm::dvm_float val = std::stod(m_const.value);
+					compiler.emitConstant({val});
+					break;
+				}
+				
+				vm::dvm_int val = std::stoll(m_const.value);
 				compiler.emitConstant({val});
+
 				break;
 			}
-			case VarType::String:
+			case TOKEN_STRING:
 			{
-				compiler.emitConstant({m_number.value});
+				compiler.emitConstant({m_const.value});
 				break;
 			}
-            default:
+			default:
 				break;
 			}
 		}
@@ -141,9 +141,6 @@ namespace dialang
 
 		void take(Compiler &compiler) override
 		{
-			CompileState &state = compiler.getState();
-			state.varDeclarationType = m_type;
-
 			if (m_init)
 				m_init->take(compiler);
 			
@@ -152,7 +149,38 @@ namespace dialang
 		}
 	};
 
-	template<class Node, typename ...Args>
+	class ASTreeVarNode : public ASTreeNodeBase
+	{
+	private:
+		Token m_name;
+	public:
+		ASTreeVarNode() = default;
+		ASTreeVarNode(Token token) : m_name(token) { }
+
+		void take(Compiler &compiler) override
+		{
+			uint8_t id = compiler.emitIdConst(m_name.value);
+			compiler.emitBytes(vm::OP_GETG, id);
+		}
+	};
+
+	class ASTreePrintStmNode : public ASTreeNodeBase
+	{
+	private:
+		ASTreeNode m_node;
+	public:
+		ASTreePrintStmNode(ASTreeNode node) : m_node(node) { }
+
+		void take(Compiler &compiler) override
+		{
+			if (m_node)
+				m_node->take(compiler);
+
+			compiler.emitBytes(vm::OP_PRINT);
+		}
+	};
+
+	template<IsASTreeNode Node, typename ...Args>
 	inline ASTreeNode makeNode(Args ...args)
 	{
 		return std::make_shared<Node>(args...);

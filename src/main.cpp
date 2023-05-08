@@ -10,7 +10,7 @@ int main()
 
 	std::string code;
 
-	if (!dialang::utils::readFile("../res/hello_world.dia", code))
+	if (!dialang::utils::readFile("../res/locals.dia", code))
 	{
 		return 1;
 	}

@@ -180,6 +180,23 @@ namespace dialang
 		}
 	};
 
+	class ASTreeBlockNode : public ASTreeNodeBase
+	{
+	private:
+		std::vector<ASTreeNode> m_nodes;
+	public:
+		ASTreeBlockNode(const std::vector<ASTreeNode> &nodes) : m_nodes(nodes) { }
+
+		void take(Compiler &compiler) override
+		{
+			compiler.beginBlock();
+
+			// compilation here
+
+			compiler.endBlock();
+		}
+	};
+
 	template<IsASTreeNode Node, typename ...Args>
 	inline ASTreeNode makeNode(Args ...args)
 	{

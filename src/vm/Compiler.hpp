@@ -20,11 +20,18 @@ namespace dialang
 		String
 	};
 
+	struct Local
+	{
+		Token name;
+		int depth;
+	};
+
 	struct CompileState
 	{
 		VarType varDeclarationType;
-		int32_t localCount;
-		int32_t scopeDepth;
+		Local locals[UINT8_MAX + 1];
+		int32_t localCount = 0;
+		int32_t scopeDepth = 0;
 	};
 
 	class Compiler

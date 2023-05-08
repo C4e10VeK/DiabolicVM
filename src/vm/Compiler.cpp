@@ -41,12 +41,12 @@ namespace dialang
 
 	void Compiler::beginBlock()
 	{
-
+		++m_state.scopeDepth;
 	}
 
 	void Compiler::endBlock()
 	{
-		
+		--m_state.scopeDepth;
 	}
 
 	void Compiler::setState(CompileState state)

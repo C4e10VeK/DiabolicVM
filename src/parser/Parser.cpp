@@ -43,6 +43,8 @@ namespace dialang
 			return parseVarDecl();
 		case TOKEN_PRINT:
 			return parsePrintStm();
+		case TOKEN_LBRACE:
+			return parseBlock();
 		default:
 			return parseExpression();
 		}
@@ -181,6 +183,21 @@ namespace dialang
 	{
 		consume(TOKEN_PRINT);
 		return  makeNode<ASTreePrintStmNode>(parseExpression());
+	}
+
+	ASTreeNode Parser::parseBlock()
+	{
+		consume(TOKEN_LBRACE);
+
+		std::vector<ASTreeNode> nodes;
+		while (!m_lexer.isEnd() && m_current.type != TOKEN_RBRACE)
+		{
+			nodes.emplace_back(parseStatement());
+		}
+
+		consume(TOKEN_RBRACE);
+
+		return makeNode<ASTreeBlockNode>(nodes);
 	}
 
 }

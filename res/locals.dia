@@ -1,0 +1,15 @@
+let x = 15
+
+{
+	let y = x * 10
+
+	{
+		let abob = "abob"
+
+		print abob
+	}
+
+	{
+		let b = y + x
+	}
+}

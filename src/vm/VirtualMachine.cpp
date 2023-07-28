@@ -61,6 +61,20 @@ namespace dialang::vm
 					m_globals[value.as<std::string>()] = m_stack.pop();
 				}
 				break;
+			case OP_GETL:
+				{
+					// not implemented yet
+					// TODO: realize get slot in stack
+					uint8_t slot = *m_ip++;
+					m_stack.push(m_stack[slot]);
+				}
+				break;
+			case OP_SETL:
+				{
+					uint8_t slot = *m_ip++;
+					m_stack[slot] = m_stack.peek(0);
+				}
+				break;
 			case OP_ADD: BIN_OP(+);	
 				break;
 			case OP_ADDI:

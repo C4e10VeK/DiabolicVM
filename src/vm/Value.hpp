@@ -12,10 +12,12 @@ namespace dialang::vm
 
 #ifdef __x86_64
 	using dvm_float = double;
-	using dvm_int = int64_t;
+	using dvm_int = int32_t;
+	using dvm_int64 = int64_t;
 #else
 	using dvm_float = float;
 	using dvm_int = int32_t;
+	using dvm_int64 = int32_t;
 #endif
 
 	using Object = std::shared_ptr<BaseObject>;

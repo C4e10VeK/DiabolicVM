@@ -56,6 +56,18 @@ namespace dialang::vm
             assert(n < m_currentSize);
             return m_data[n];
         }
+
+        const Value &operator[](size_t index) const
+        {
+            assert(index < m_currentSize);
+            return m_data[index];
+        }
+
+        Value &operator[](size_t index)
+        {
+            assert(index < m_currentSize);
+            return m_data[index];
+        }
     };
 }
 

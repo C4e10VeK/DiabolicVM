@@ -107,7 +107,7 @@ namespace dialang
 					break;
 				}
 				
-				vm::dvm_int val = std::stoll(m_const.value);
+				vm::dvm_int val = std::stoi(m_const.value);
 				compiler.emitConstant({val});
 
 				break;
@@ -141,6 +141,16 @@ namespace dialang
 
 		void take(Compiler &compiler) override
 		{
+			auto &state = compiler.getState();
+
+			if (state.scopeDepth == 0) {
+				return;
+			}
+
+			Local &local = state.locals[state.localCount++];
+			local.name = m_token;
+			local.depth = state.scopeDepth;
+
 			if (m_init)
 				m_init->take(compiler);
 			
@@ -191,7 +201,10 @@ namespace dialang
 		{
 			compiler.beginBlock();
 
-			// compilation here
+			for (auto &node : m_nodes)
+			{
+				node->take(compiler);
+			}
 
 			compiler.endBlock();
 		}
